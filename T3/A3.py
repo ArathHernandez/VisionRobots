@@ -1,42 +1,24 @@
 import cv2
 import matplotlib.pyplot as plt
 
-# Cargamos la imagen en blanco y negro
-img_bn = cv2.imread('Numeros_Binarizacion.jpg', cv2.IMREAD_GRAYSCALE)
+imagen = cv2.imread('sudoku.jpg', cv2.IMREAD_GRAYSCALE)
+imagen = cv2.resize(imagen, (700, 700))
 
-# Mostramos la imagen
-cv2.imshow('Imagen en blanco y negro', img_bn)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+imagen_gauss = cv2.GaussianBlur(imagen, (5, 5), 0)
 
-# Aplicamos el filtro gaussiano
-img_filtrada = cv2.GaussianBlur(img_bn, (5, 5), 0)
+ret, imagen_bn_bin = cv2.threshold(imagen, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+ret, imagen_gauss_bin = cv2.threshold(imagen_gauss, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-# Mostramos la imagen filtrada
-cv2.imshow('Imagen filtrada', img_filtrada)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.imshow('Imagen binarizada antes de gauss', imagen_bn_bin)
+cv2.imshow('Imagen binarizada despues de gauss', imagen_gauss_bin)
 
-# Binarización de la imagen sin filtro
-ret, img_bn_bin = cv2.threshold(img_bn, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+hist = cv2.calcHist([imagen_gauss_bin], [0], None, [256], [0, 256])
+hist_antes = cv2.calcHist([imagen_bn_bin], [0], None, [256], [0, 256])
 
-# Mostramos la imagen binarizada
-cv2.imshow('Imagen binarizada sin filtro', img_bn_bin)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-# Binarización de la imagen con filtro
-ret, img_filtrada_bin = cv2.threshold(img_filtrada, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-# Mostramos la imagen binarizada
-cv2.imshow('Imagen binarizada con filtro', img_filtrada_bin)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-# Calculamos el histograma de la imagen filtrada binarizada
-hist = cv2.calcHist([img_filtrada_bin], [0], None, [256], [0, 256])
-
-# Mostramos el histograma
 plt.plot(hist)
+plt.plot(hist_antes)
 plt.xlim([0, 256])
 plt.show()
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
